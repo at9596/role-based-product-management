@@ -1,39 +1,58 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <div class="mb-4">
-        <h1 class="h3 mb-1">Edit Category</h1>
-        <p class="text-muted mb-0">Update category information</p>
-    </div>
+<div class="min-h-screen bg-gray-100 py-8 px-4">
+    <div class="max-w-lg mx-auto">
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
+        {{-- Header --}}
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Edit Category</h1>
+                <p class="text-sm text-gray-500 mt-1">Update category information</p>
+            </div>
+            <a href="{{ route('categories.index') }}"
+               class="text-sm text-blue-600 hover:underline font-medium">
+                ← Back
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
             <form action="{{ route('categories.update', $category->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="mb-3">
-                    <label for="name" class="form-label">Category Name</label>
+                <div class="p-5">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                        Category Name
+                    </label>
                     <input
                         type="text"
                         name="name"
                         id="name"
-                        class="form-control @error('name') is-invalid @enderror"
                         value="{{ old('name', $category->name) }}"
                         placeholder="Enter category name"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                               @error('name') border-red-500 @enderror"
                     >
                     @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Update Category</button>
-                    <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                <div class="px-5 py-4 border-t border-gray-100 flex gap-3">
+                    <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-5 rounded-lg">
+                        Update Category
+                    </button>
+                    <a href="{{ route('categories.index') }}"
+                       class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-5 rounded-lg">
+                        Cancel
+                    </a>
                 </div>
             </form>
         </div>
+
     </div>
 </div>
 @endsection

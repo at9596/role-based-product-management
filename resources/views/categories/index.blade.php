@@ -1,80 +1,93 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1">Categories</h1>
-            <p class="text-muted mb-0">Manage product categories</p>
-        </div>
+<div class="min-h-screen bg-gray-100 py-8 px-4">
+    <div class="max-w-4xl mx-auto">
 
-        <a href="{{ route('categories.create') }}" class="btn btn-primary">
-            Add Category
-        </a>
-    </div>
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if($categories->count())
-        <div class="card border-0 shadow-sm">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Created At</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($categories as $category)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td class="fw-semibold">{{ $category->name }}</td>
-                                <td>{{ $category->created_at->format('d M Y') }}</td>
-                                <td class="text-end">
-                                    <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-sm btn-outline-warning">
-                                        Edit
-                                    </a>
-
-                                    @if(auth()->user()->hasRole('Admin'))
-                                        <form action="{{ route('categories.destroy', $category->id) }}"
-                                              method="POST"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this category?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        {{-- Header --}}
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Categories</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage product categories</p>
             </div>
+            <a href="{{ route('categories.create') }}"
+               class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg">
+                + Add Category
+            </a>
         </div>
 
-        <div class="mt-4">
-            {{ $categories->links() }}
-        </div>
-    @else
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-5">
-                <h4 class="mb-2">No categories found</h4>
-                <p class="text-muted mb-3">Start by creating your first category.</p>
-                <a href="{{ route('categories.create') }}" class="btn btn-primary">
+        {{-- Flash Message --}}
+        @if(session('success'))
+            <div class="bg-green-100 text-green-700 border border-green-200 rounded-lg px-4 py-3 mb-5 text-sm">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        {{-- Table --}}
+        @if($categories->count())
+            <div class="bg-white rounded-lg shadow">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left text-xs font-semibold text-gray-500 uppercase px-5 py-3">#</th>
+                                <th class="text-left text-xs font-semibold text-gray-500 uppercase px-5 py-3">Name</th>
+                                <th class="text-left text-xs font-semibold text-gray-500 uppercase px-5 py-3">Created At</th>
+                                <th class="text-right text-xs font-semibold text-gray-500 uppercase px-5 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($categories as $category)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-5 py-3 text-gray-500">{{ $loop->iteration }}</td>
+                                    <td class="px-5 py-3 font-medium text-gray-800">{{ $category->name }}</td>
+                                    <td class="px-5 py-3 text-gray-500">{{ $category->created_at->format('d M Y') }}</td>
+                                    <td class="px-5 py-3 text-right">
+                                        <div class="flex items-center justify-end gap-3">
+                                            <a href="{{ route('categories.edit', $category->id) }}"
+                                               class="text-yellow-600 hover:underline font-medium">
+                                                Edit
+                                            </a>
+
+                                            @if(auth()->user()->hasRole('Admin'))
+                                                <form action="{{ route('categories.destroy', $category->id) }}"
+                                                      method="POST" class="inline"
+                                                      onsubmit="return confirm('Delete this category?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            class="text-red-600 hover:underline font-medium">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Pagination --}}
+                @if($categories->hasPages())
+                    <div class="px-5 py-4 border-t border-gray-100">
+                        {{ $categories->links() }}
+                    </div>
+                @endif
+            </div>
+
+        @else
+            <div class="bg-white rounded-lg shadow px-5 py-12 text-center">
+                <p class="text-gray-800 font-semibold mb-1">No categories found</p>
+                <p class="text-sm text-gray-500 mb-4">Start by creating your first category.</p>
+                <a href="{{ route('categories.create') }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg">
                     Create Category
                 </a>
             </div>
-        </div>
-    @endif
+        @endif
+
+    </div>
 </div>
 @endsection

@@ -1,161 +1,46 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <div class="mb-4">
-        <h1 class="h3 mb-1">Edit Product</h1>
-        <p class="text-muted mb-0">Update product details and image</p>
-    </div>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="name" class="form-label">Product Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            class="form-control @error('name') is-invalid @enderror"
-                            value="{{ old('name', $product->name) }}"
-                            placeholder="Enter product name"
-                        >
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="price" class="form-label">Price</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            name="price"
-                            id="price"
-                            class="form-control @error('price') is-invalid @enderror"
-                            value="{{ old('price', $product->price) }}"
-                            placeholder="Enter price"
-                        >
-                        @error('price')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-12">
-                        <label for="category_id" class="form-label">Category</label>
-                        <select
-                            name="category_id"
-                            id="category_id"
-                            class="form-select @error('category_id') is-invalid @enderror"
-                        >
-                            <option value="">Select Category</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}"
-                                    {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('category_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-12">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea
-                            name="description"
-                            id="description"
-                            rows="4"
-                            class="form-control @error('description') is-invalid @enderror"
-                            placeholder="Enter product description"
-                        >{{ old('description', $product->description) }}</textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-12">
-                        <label for="image" class="form-label">Product Image</label>
-                        <input
-                            type="file"
-                            name="image"
-                            id="image"
-                            accept="image/*"
-                            class="form-control @error('image') is-invalid @enderror"
-                        >
-                        @error('image')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-
-                        <small class="text-muted d-block mt-2">
-                            Leave empty if you do not want to change the image.
-                        </small>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="row g-3 mt-1">
-                            <div class="col-md-6">
-                                <label class="form-label">Current Image</label>
-                                <div class="border rounded p-2 bg-light text-center">
-                                    @if($product->image)
-                                        <img
-                                            src="{{ asset('storage/' . $product->image) }}"
-                                            alt="{{ $product->name }}"
-                                            class="img-fluid rounded"
-                                            style="max-height: 300px;"
-                                        >
-                                    @else
-                                        <p class="text-muted mb-0">No image available</p>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">New Preview</label>
-                                <div class="border rounded p-2 bg-light text-center">
-                                    <img id="preview-image" src="" alt="Preview" class="img-fluid d-none" style="max-height: 300px;">
-                                    <p id="preview-placeholder" class="text-muted mb-0">No new image selected</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 d-flex gap-2 mt-3">
-                        <button type="submit" class="btn btn-primary">Update Product</button>
-                        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Cancel</a>
-                    </div>
-                </div>
-            </form>
+    {{-- Page Header --}}
+    <div class="mb-6">
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+            <a href="{{ route('products.index') }}" class="hover:text-indigo-600 transition">Products</a>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('products.show', $product->id) }}" class="hover:text-indigo-600 transition truncate max-w-[200px]">
+                {{ $product->name }}
+            </a>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <span class="text-gray-700 font-medium">Edit</span>
         </div>
+        <h1 class="text-2xl font-bold text-gray-900">Edit Product</h1>
+        <p class="text-sm text-gray-500 mt-1">Update the product details below. Leave the image field empty to keep the current image.</p>
     </div>
+
+    {{-- Validation Errors Summary --}}
+    @if($errors->any())
+        <div class="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+            <p class="text-sm font-semibold text-red-700 mb-1">Please fix the following errors:</p>
+            <ul class="list-disc list-inside text-sm text-red-600 space-y-0.5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- Form Card --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+        @include('products.partials._form', [
+            'formAction'  => route('products.update', $product->id),
+            'formMethod'  => 'PUT',
+            'submitLabel' => 'Update Product',
+            'categories'  => $categories,
+            'product'     => $product,
+            'imageHint'   => 'Leave empty to keep the current image · Max 2 MB',
+        ])
+    </div>
+
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    const imageInput = document.getElementById('image');
-    const previewImage = document.getElementById('preview-image');
-    const previewPlaceholder = document.getElementById('preview-placeholder');
-
-    imageInput.addEventListener('change', function (e) {
-        const file = e.target.files[0];
-
-        if (!file) return;
-
-        const reader = new FileReader();
-
-        reader.onload = function (event) {
-            previewImage.src = event.target.result;
-            previewImage.classList.remove('d-none');
-            previewPlaceholder.classList.add('d-none');
-        };
-
-        reader.readAsDataURL(file);
-    });
-</script>
-@endpush
