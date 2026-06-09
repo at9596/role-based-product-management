@@ -28,6 +28,21 @@
         <div class="text-center mt-10">
             <h1>Role-Based Product Management System</h1>
             <p>Laravel + Spatie Permission</p>
+            @auth
+                <div class="flex flex-col items-center gap-2 mt-10">
+                    <span>Welcome, {{ auth()->user()->name }}</span>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-red-500 text-white rounded"
+                        >
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            @endauth
         </div>
     </div>
 </body>
