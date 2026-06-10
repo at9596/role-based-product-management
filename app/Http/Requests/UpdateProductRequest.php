@@ -23,11 +23,12 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'name'          => ['required', 'string', 'max:255'],
+            'description'   => ['nullable', 'string'],
+            'price'         => ['required', 'numeric', 'min:0'],
+            'category_id'   => ['required', 'exists:categories,id'],
+            // Accepts the base64 cropped image string from Cropper.js
+            'image_cropped' => ['nullable', 'string'],
         ];
     }
 }

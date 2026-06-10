@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -35,11 +36,13 @@ class ProductController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+        if (!empty($data['image_cropped'])) {
+            $data['image'] = $this->saveCroppedImage($data['image_cropped']);
         }
 
+        unset($data['image_cropped']);
         Product::create($data);
+
         return redirect()
             ->route('products.index')
             ->with('success', 'Product created successfully.');
@@ -59,8 +62,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-       $categories = Category::orderBy('name')->get();
-       return view('products.edit', compact('product', 'categories'));
+        $categories = Category::orderBy('name')->get();
+        return view('products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -69,14 +72,17 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $data = $request->validated();
-        if ($request->hasFile('image')) {
+
+        if (!empty($data['image_cropped'])) {
+            // Delete the old image from storage
             if ($product->image && Storage::disk('public')->exists($product->image)) {
                 Storage::disk('public')->delete($product->image);
             }
 
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $data['image'] = $this->saveCroppedImage($data['image_cropped']);
         }
 
+        unset($data['image_cropped']);
         $product->update($data);
 
         return redirect()
@@ -98,5 +104,29 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * Decode a base64 data-URL, save it to storage/app/public/products,
+     * and return the relative path (e.g. "products/abc123.jpg").
+     */
+    private function saveCroppedImage(string $dataUrl): string
+    {
+        // Strip the data-URL header (e.g. "data:image/jpeg;base64,")
+        [$meta, $base64] = explode(',', $dataUrl, 2);
+
+        // Detect extension from mime type
+        preg_match('/data:image\/(\w+);base64/', $meta, $matches);
+        $extension = isset($matches[1]) ? strtolower($matches[1]) : 'jpg';
+        if ($extension === 'jpeg') {
+            $extension = 'jpg';
+        }
+
+        $decoded  = base64_decode($base64);
+        $filename = 'products/' . Str::uuid() . '.' . $extension;
+
+        Storage::disk('public')->put($filename, $decoded);
+
+        return $filename;
     }
 }
