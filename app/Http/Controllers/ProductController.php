@@ -107,24 +107,42 @@ class ProductController extends Controller
     }
 
     /**
-     * Decode a base64 data-URL, save it to storage/app/public/products,
-     * and return the relative path (e.g. "products/abc123.jpg").
+     * Decode a base64 data-URL, validate it server-side, save to
+     * storage/app/public/products and return the relative path.
+     *
+     * @throws \InvalidArgumentException on invalid or unsafe input
      */
     private function saveCroppedImage(string $dataUrl): string
     {
-        // Strip the data-URL header (e.g. "data:image/jpeg;base64,")
-        [$meta, $base64] = explode(',', $dataUrl, 2);
-
-        // Detect extension from mime type
-        preg_match('/data:image\/(\w+);base64/', $meta, $matches);
-        $extension = isset($matches[1]) ? strtolower($matches[1]) : 'jpg';
-        if ($extension === 'jpeg') {
-            $extension = 'jpg';
+        if (!str_starts_with($dataUrl, 'data:image/')) {
+            abort(422, 'Invalid image data.');
         }
 
-        $decoded  = base64_decode($base64);
-        $filename = 'products/' . Str::uuid() . '.' . $extension;
+        [$meta, $base64] = explode(',', $dataUrl, 2);
 
+        $allowedMimes = ['jpeg', 'jpg', 'png', 'webp'];
+        preg_match('/data:image\/(\w+);base64/', $meta, $matches);
+        $rawExt    = strtolower($matches[1] ?? '');
+        $extension = $rawExt === 'jpeg' ? 'jpg' : $rawExt;
+
+        if (!in_array($extension, $allowedMimes, true)) {
+            abort(422, 'Unsupported image type. Allowed: JPG, PNG, WEBP.');
+        }
+
+        $decoded = base64_decode($base64, strict: true);
+        if ($decoded === false) {
+            abort(422, 'Corrupted image data.');
+        }
+
+        if (strlen($decoded) > 5 * 1024 * 1024) {
+            abort(422, 'Image exceeds the 5 MB server limit.');
+        }
+
+        if (@getimagesizefromstring($decoded) === false) {
+            abort(422, 'Uploaded file is not a valid image.');
+        }
+
+        $filename = 'products/' . Str::uuid() . '.' . $extension;
         Storage::disk('public')->put($filename, $decoded);
 
         return $filename;
