@@ -13,6 +13,30 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            @role('Admin')
+            <div class="bg-white rounded-lg shadow p-5">
+                <p class="text-sm text-gray-500 mb-1">Admin Dashboard</p>
+                <p class="text-sm text-gray-600 mb-3">Manage products, categories, and users.</p>
+                <a href="{{ route('admin.dashboard') }}"
+                   class="inline-block px-4 py-2 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 transition">
+                    Go to Admin Dashboard
+                </a>
+            </div>
+            @endrole
+
+            
+            @role('Admin|Manager')
+            <div class="bg-white rounded-lg shadow p-5">
+                <p class="text-sm text-gray-500 mb-1">Manager Dashboard</p>
+                <p class="text-sm text-gray-600 mb-3">Manage products and categories.</p>
+                <a href="{{ route('manager.dashboard') }}"
+                   class="inline-block px-4 py-2 bg-green-500 text-white text-sm font-medium rounded hover:bg-green-600 transition">
+                    Go to Manager Dashboard
+                </a>
+            </div>
+            @endrole
+
             <div class="bg-white rounded-lg shadow p-5">
                 <p class="text-sm text-gray-500 mb-1">Products</p>
                 <p class="text-sm text-gray-600 mb-3">Browse and view all available products.</p>
