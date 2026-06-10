@@ -8,15 +8,15 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreCategoryRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Defer authorization to CategoryPolicy::create().
      */
     public function authorize(): bool
     {
-         return $this->user()?->hasAnyRole(['Admin', 'Manager']) ?? false;
+        return $this->user()?->can('create', \App\Models\Category::class) ?? false;
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Validation rules for creating a category.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

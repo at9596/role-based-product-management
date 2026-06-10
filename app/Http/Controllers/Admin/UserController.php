@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateUserRoleRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -15,6 +15,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles')->latest()->paginate(10);
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -24,6 +25,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load('roles');
+
         return view('admin.users.show', compact('user'));
     }
 
@@ -34,20 +36,17 @@ class UserController extends Controller
     {
         $roles = Role::orderBy('name')->get();
         $user->load('roles');
+
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
     /**
      * Update the user's role.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRoleRequest $request, User $user)
     {
-        $request->validate([
-            'role' => ['required', 'exists:roles,name'],
-        ]);
-
-        // Sync replaces all current roles with the selected one
-        $user->syncRoles([$request->role]);
+        // syncRoles replaces all current roles with the newly selected one
+        $user->syncRoles([$request->validated('role')]);
 
         return redirect()
             ->route('admin.users.index')
@@ -55,11 +54,10 @@ class UserController extends Controller
     }
 
     /**
-     * Delete a user.
+     * Delete a user account.
      */
     public function destroy(User $user)
     {
-        // Prevent admin from deleting themselves
         if ($user->id === auth()->id()) {
             return back()->with('error', 'You cannot delete your own account.');
         }

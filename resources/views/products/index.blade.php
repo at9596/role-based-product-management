@@ -10,28 +10,20 @@
             <p class="text-sm text-gray-500 mt-1">Browse and manage your product catalog</p>
         </div>
 
-        @auth
-            @if(auth()->user()->hasAnyRole(['Admin', 'Manager']))
-                <a href="{{ route('products.create') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow transition duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add Product
-                </a>
-            @endif
-        @endauth
+        @can('create', App\Models\Product::class)
+            <a href="{{ route('products.create') }}"
+               class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow transition duration-150">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Product
+            </a>
+        @endcan
     </div>
 
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 text-sm rounded-lg px-4 py-3 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            {{ session('success') }}
-        </div>
-    @endif
+    {{-- Flash Messages --}}
+    <x-alert type="success" />
+    <x-alert type="error" />
 
     @if($products->count())
         {{-- Products Table --}}
@@ -86,7 +78,7 @@
 
                                 {{-- Price --}}
                                 <td class="px-6 py-4">
-                                    <span class="text-sm font-bold text-gray-900">₹{{ number_format($product->price, 2) }}</span>
+                                    <span class="text-sm font-bold text-gray-900">{{ $product->formatted_price }}</span>
                                 </td>
 
                                 {{-- Description --}}
@@ -99,33 +91,31 @@
                                 {{-- Actions --}}
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('products.show', $product->id) }}"
+                                        <a href="{{ route('products.show', $product) }}"
                                            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-sky-700 bg-sky-50 border border-sky-200 rounded-lg hover:bg-sky-100 transition">
                                             View
                                         </a>
 
-                                        @auth
-                                            @if(auth()->user()->hasAnyRole(['Admin', 'Manager']))
-                                                <a href="{{ route('products.edit', $product->id) }}"
-                                                   class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition">
-                                                    Edit
-                                                </a>
-                                            @endif
+                                        @can('update', $product)
+                                            <a href="{{ route('products.edit', $product) }}"
+                                               class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition">
+                                                Edit
+                                            </a>
+                                        @endcan
 
-                                            @if(auth()->user()->hasRole('Admin'))
-                                                <form action="{{ route('products.destroy', $product->id) }}"
-                                                      method="POST"
-                                                      class="inline"
-                                                      onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition cursor-pointer">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        @endauth
+                                        @can('delete', $product)
+                                            <form action="{{ route('products.destroy', $product) }}"
+                                                  method="POST"
+                                                  class="inline"
+                                                  onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition cursor-pointer">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -151,17 +141,15 @@
             <h3 class="text-lg font-semibold text-gray-800 mb-1">No products found</h3>
             <p class="text-sm text-gray-500 mb-6">There are no products available right now.</p>
 
-            @auth
-                @if(auth()->user()->hasAnyRole(['Admin', 'Manager']))
-                    <a href="{{ route('products.create') }}"
-                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Create First Product
-                    </a>
-                @endif
-            @endauth
+            @can('create', App\Models\Product::class)
+                <a href="{{ route('products.create') }}"
+                   class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create First Product
+                </a>
+            @endcan
         </div>
     @endif
 </div>

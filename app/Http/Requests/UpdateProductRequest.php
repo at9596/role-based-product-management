@@ -8,15 +8,15 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateProductRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Defer authorization to ProductPolicy::update().
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasAnyRole(['Admin', 'Manager']);
+        return $this->user()?->can('update', $this->route('product')) ?? false;
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Validation rules for updating a product.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

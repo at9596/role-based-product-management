@@ -2,19 +2,25 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateCategoryRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Defer authorization to CategoryPolicy::update().
      */
     public function authorize(): bool
     {
-        return  $this->user()?->hasAnyRole(['Admin', 'Manager']);
+        return $this->user()?->can('update', $this->route('category')) ?? false;
     }
 
+    /**
+     * Validation rules for updating a category.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [

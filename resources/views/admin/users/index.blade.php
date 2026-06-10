@@ -4,18 +4,17 @@
 <div class="min-h-screen bg-gray-100 py-8 px-4">
     <div class="max-w-6xl mx-auto">
 
+        {{-- Header --}}
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Users</h1>
+            <a href="{{ route('admin.dashboard') }}" class="text-sm text-blue-600 hover:underline font-medium">
+                ← Admin Dashboard
+            </a>
+        </div>
 
         {{-- Flash Messages --}}
-        @if(session('success'))
-            <div class="bg-green-100 text-green-700 border border-green-200 rounded-lg px-4 py-3 mb-5 text-sm">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="bg-red-100 text-red-700 border border-red-200 rounded-lg px-4 py-3 mb-5 text-sm">
-                {{ session('error') }}
-            </div>
-        @endif
+        <x-alert type="success" />
+        <x-alert type="error" />
 
         {{-- Users Table --}}
         <div class="bg-white rounded-lg shadow">
@@ -49,12 +48,7 @@
                                 <td class="px-5 py-3">
                                     @if($user->roles->isNotEmpty())
                                         @foreach($user->roles as $role)
-                                            <span class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full
-                                                @if($role->name === 'Admin') bg-purple-100 text-purple-700
-                                                @elseif($role->name === 'Manager') bg-blue-100 text-blue-700
-                                                @else bg-gray-100 text-gray-600 @endif">
-                                                {{ $role->name }}
-                                            </span>
+                                            <x-role-badge :role="$role" />
                                         @endforeach
                                     @else
                                         <span class="text-xs text-gray-400">No role</span>

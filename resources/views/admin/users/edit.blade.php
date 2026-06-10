@@ -13,6 +13,10 @@
             </a>
         </div>
 
+        {{-- Flash Messages --}}
+        <x-alert type="success" />
+        <x-alert type="error" />
+
         <div class="bg-white rounded-lg shadow">
             <div class="px-5 py-4 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-800">{{ $user->name }}</h2>
@@ -30,12 +34,7 @@
                         <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Current Role</p>
                         <div class="flex gap-2">
                             @forelse($user->roles as $role)
-                                <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full
-                                    @if($role->name === 'Admin') bg-purple-100 text-purple-700
-                                    @elseif($role->name === 'Manager') bg-blue-100 text-blue-700
-                                    @else bg-gray-100 text-gray-600 @endif">
-                                    {{ $role->name }}
-                                </span>
+                                <x-role-badge :role="$role" />
                             @empty
                                 <span class="text-sm text-gray-400">No role assigned</span>
                             @endforelse

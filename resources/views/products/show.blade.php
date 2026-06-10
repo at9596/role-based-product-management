@@ -12,15 +12,9 @@
         <span class="text-gray-700 font-medium truncate max-w-[240px]">{{ $product->name }}</span>
     </div>
 
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 text-sm rounded-lg px-4 py-3 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            {{ session('success') }}
-        </div>
-    @endif
+    {{-- Flash Messages --}}
+    <x-alert type="success" />
+    <x-alert type="error" />
 
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="md:flex">
@@ -61,7 +55,7 @@
 
                     {{-- Price --}}
                     <p class="text-3xl font-extrabold text-indigo-600 mb-5">
-                        ₹{{ number_format($product->price, 2) }}
+                        {{ $product->formatted_price }}
                     </p>
 
                     {{-- Description --}}
@@ -98,35 +92,33 @@
                         Back
                     </a>
 
-                    @auth
-                        @if(auth()->user()->hasAnyRole(['Admin', 'Manager']))
-                            <a href="{{ route('products.edit', $product->id) }}"
-                               class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                                Edit Product
-                            </a>
-                        @endif
+                    @can('update', $product)
+                        <a href="{{ route('products.edit', $product) }}"
+                           class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Edit Product
+                        </a>
+                    @endcan
 
-                        @if(auth()->user()->hasRole('Admin'))
-                            <form
-                                action="{{ route('products.destroy', $product->id) }}"
-                                method="POST"
-                                onsubmit="return confirm('Delete \'{{ addslashes($product->name) }}\'? This cannot be undone.');"
-                            >
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                    Delete
-                                </button>
-                            </form>
-                        @endif
-                    @endauth
+                    @can('delete', $product)
+                        <form
+                            action="{{ route('products.destroy', $product) }}"
+                            method="POST"
+                            onsubmit="return confirm('Delete \'{{ addslashes($product->name) }}\'? This cannot be undone.');"
+                        >
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition cursor-pointer">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Delete
+                            </button>
+                        </form>
+                    @endcan
 
                 </div>
             </div>

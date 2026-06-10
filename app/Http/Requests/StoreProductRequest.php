@@ -7,13 +7,16 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreProductRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Defer authorization to ProductPolicy::create().
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasAnyRole(['Admin', 'Manager']);
+        return $this->user()?->can('create', \App\Models\Product::class) ?? false;
     }
 
+    /**
+     * Validation rules for creating a product.
+     */
     public function rules(): array
     {
         return [
