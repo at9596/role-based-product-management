@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function () {
             ->name('manager.dashboard');
 
         // Products — write access (static routes first)
+         // Export Products
+        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
         Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
@@ -82,6 +84,8 @@ Route::middleware('auth')->group(function () {
         // Products — delete
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])
             ->name('products.destroy');
+        
+       
 
         // Categories — delete
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])

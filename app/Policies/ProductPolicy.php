@@ -30,4 +30,9 @@ class ProductPolicy
     {
         return $user->hasRole('Admin');
     }
+
+    public function export(User $user): bool
+    {
+        return $user->hasRole('Admin');
+    }
 }

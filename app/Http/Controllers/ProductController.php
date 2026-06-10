@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Services\ImageService;
+use App\Jobs\GenerateProductsPdf;
 
 class ProductController extends Controller
 {
@@ -110,5 +111,16 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Product deleted successfully.');
+    }
+
+    public function export()
+    {
+        $this->authorize('export', Product::class);
+        GenerateProductsPdf::dispatch();
+
+        return back()->with(
+            'success',
+            'PDF generation started in background.'
+        );
     }
 }

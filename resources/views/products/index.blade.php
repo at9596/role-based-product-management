@@ -19,6 +19,14 @@
                 Add Product
             </a>
         @endcan
+
+        @can('export', App\Models\Product::class)
+            <a href="{{ route('products.export') }}"
+            class="bg-green-600 text-white px-4 py-2 rounded">
+                Export Products PDF
+            </a>
+        @endcan
+
     </div>
 
     {{-- Flash Messages --}}
