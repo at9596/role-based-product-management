@@ -11,12 +11,8 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Cropper.js CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
-
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
@@ -36,8 +32,6 @@
                 @yield('content')
             </main>
         </div>
-        <!-- Cropper.js JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
         @stack('scripts')
     </body>
 </html>
